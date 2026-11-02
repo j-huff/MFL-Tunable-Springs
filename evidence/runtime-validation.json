@@ -1,0 +1,329 @@
+[
+  {
+    "stage": "stock",
+    "status": {
+      "state": "hooked",
+      "message": "",
+      "pid": 312,
+      "enabled": false,
+      "revision": 0,
+      "updates": 17665,
+      "samples": [
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.363389,
+          "stiffness": 400,
+          "damping": 30,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.933212,
+          "stiffness": 400,
+          "damping": 30,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -1.0411,
+          "stiffness": 400,
+          "damping": 30,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.161584,
+          "stiffness": 400,
+          "damping": 30,
+          "compression": false
+        }
+      ]
+    }
+  },
+  {
+    "stage": "custom",
+    "status": {
+      "state": "hooked",
+      "message": "",
+      "pid": 312,
+      "enabled": true,
+      "revision": 1,
+      "updates": 18469,
+      "samples": [
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.747996,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -2.13714,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.519004,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.977259,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        }
+      ]
+    }
+  },
+  {
+    "stage": "custom",
+    "status": {
+      "state": "hooked",
+      "message": "",
+      "pid": 312,
+      "enabled": true,
+      "revision": 1,
+      "updates": 19273,
+      "samples": [
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.682897,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.550193,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.589909,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.323693,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        }
+      ]
+    }
+  },
+  {
+    "stage": "custom",
+    "status": {
+      "state": "error",
+      "message": "GameAssembly did not load",
+      "pid": 336,
+      "enabled": false,
+      "revision": 0,
+      "updates": 0,
+      "samples": []
+    }
+  },
+  {
+    "stage": "custom",
+    "status": {
+      "state": "hooked",
+      "message": "",
+      "pid": 312,
+      "enabled": true,
+      "revision": 1,
+      "updates": 20889,
+      "samples": [
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.146413,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": 0.065105,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.52677,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.517415,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        }
+      ]
+    }
+  },
+  {
+    "stage": "custom",
+    "status": {
+      "state": "hooked",
+      "message": "",
+      "pid": 312,
+      "enabled": true,
+      "revision": 1,
+      "updates": 21685,
+      "samples": [
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -1.12769,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -1.82569,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": 0.156743,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": 0.11877,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        }
+      ]
+    }
+  },
+  {
+    "stage": "custom",
+    "status": {
+      "state": "hooked",
+      "message": "",
+      "pid": 312,
+      "enabled": true,
+      "revision": 1,
+      "updates": 22485,
+      "samples": [
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.276185,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -1.62511,
+          "stiffness": 500,
+          "damping": 40,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.901605,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.536978,
+          "stiffness": 500,
+          "damping": 70,
+          "compression": false
+        }
+      ]
+    }
+  },
+  {
+    "stage": "restored",
+    "status": {
+      "state": "hooked",
+      "message": "",
+      "pid": 312,
+      "enabled": false,
+      "revision": 2,
+      "updates": 24085,
+      "samples": [
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -2.19002,
+          "stiffness": 400,
+          "damping": 30,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -2.09,
+          "stiffness": 400,
+          "damping": 30,
+          "compression": false
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.66917,
+          "stiffness": 400,
+          "damping": 30,
+          "compression": true
+        },
+        {
+          "id": 59,
+          "kind": 0,
+          "distance": -0.733476,
+          "stiffness": 400,
+          "damping": 30,
+          "compression": true
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,260 @@
+
+GameAssembly.dll:     file format pei-x86-64
+
+
+Disassembly of section il2cpp:
+
+000000018059e6c0 <il2cpp+0x29e6c0>:
+   18059e6c0:	48 89 5c 24 08       	mov    %rbx,0x8(%rsp)
+   18059e6c5:	57                   	push   %rdi
+   18059e6c6:	48 83 ec 50          	sub    $0x50,%rsp
+   18059e6ca:	80 3d 46 99 fb 01 00 	cmpb   $0x0,0x1fb9946(%rip)        # 0x182558017
+   18059e6d1:	48 8b d9             	mov    %rcx,%rbx
+   18059e6d4:	0f 29 74 24 40       	movaps %xmm6,0x40(%rsp)
+   18059e6d9:	0f 28 f1             	movaps %xmm1,%xmm6
+   18059e6dc:	75 18                	jne    0x18059e6f6
+   18059e6de:	48 8d 0d a3 bc e9 01 	lea    0x1e9bca3(%rip),%rcx        # 0x18243a388
+   18059e6e5:	e8 46 0a ca ff       	call   0x18023f130
+   18059e6ea:	f0 83 0c 24 00       	lock orl $0x0,(%rsp)
+   18059e6ef:	c6 05 21 99 fb 01 01 	movb   $0x1,0x1fb9921(%rip)        # 0x182558017
+   18059e6f6:	48 8b 0d 8b bc e9 01 	mov    0x1e9bc8b(%rip),%rcx        # 0x18243a388
+   18059e6fd:	48 8b bb a0 00 00 00 	mov    0xa0(%rbx),%rdi
+   18059e704:	83 b9 e0 00 00 00 00 	cmpl   $0x0,0xe0(%rcx)
+   18059e70b:	75 05                	jne    0x18059e712
+   18059e70d:	e8 0e 16 d1 ff       	call   0x1802afd20
+   18059e712:	80 3d 7b 54 fc 01 00 	cmpb   $0x0,0x1fc547b(%rip)        # 0x182563b94
+   18059e719:	75 18                	jne    0x18059e733
+   18059e71b:	48 8d 0d 66 bc e9 01 	lea    0x1e9bc66(%rip),%rcx        # 0x18243a388
+   18059e722:	e8 09 0a ca ff       	call   0x18023f130
+   18059e727:	f0 83 0c 24 00       	lock orl $0x0,(%rsp)
+   18059e72c:	c6 05 61 54 fc 01 01 	movb   $0x1,0x1fc5461(%rip)        # 0x182563b94
+   18059e733:	48 8b 0d 4e bc e9 01 	mov    0x1e9bc4e(%rip),%rcx        # 0x18243a388
+   18059e73a:	83 b9 e0 00 00 00 00 	cmpl   $0x0,0xe0(%rcx)
+   18059e741:	75 05                	jne    0x18059e748
+   18059e743:	e8 d8 15 d1 ff       	call   0x1802afd20
+   18059e748:	80 3d eb 53 fc 01 00 	cmpb   $0x0,0x1fc53eb(%rip)        # 0x182563b3a
+   18059e74f:	75 18                	jne    0x18059e769
+   18059e751:	48 8d 0d 30 bc e9 01 	lea    0x1e9bc30(%rip),%rcx        # 0x18243a388
+   18059e758:	e8 d3 09 ca ff       	call   0x18023f130
+   18059e75d:	f0 83 0c 24 00       	lock orl $0x0,(%rsp)
+   18059e762:	c6 05 d1 53 fc 01 01 	movb   $0x1,0x1fc53d1(%rip)        # 0x182563b3a
+   18059e769:	48 85 ff             	test   %rdi,%rdi
+   18059e76c:	0f 84 3d 01 00 00    	je     0x18059e8af
+   18059e772:	48 8b 0d 0f bc e9 01 	mov    0x1e9bc0f(%rip),%rcx        # 0x18243a388
+   18059e779:	83 b9 e0 00 00 00 00 	cmpl   $0x0,0xe0(%rcx)
+   18059e780:	75 05                	jne    0x18059e787
+   18059e782:	e8 99 15 d1 ff       	call   0x1802afd20
+   18059e787:	48 83 7f 10 00       	cmpq   $0x0,0x10(%rdi)
+   18059e78c:	0f 84 1d 01 00 00    	je     0x18059e8af
+   18059e792:	0f 28 c6             	movaps %xmm6,%xmm0
+   18059e795:	f3 0f 5c 83 d0 00 00 	subss  0xd0(%rbx),%xmm0
+   18059e79c:	00 
+   18059e79d:	0f 54 05 8c 60 c3 01 	andps  0x1c3608c(%rip),%xmm0        # 0x1821d4830
+   18059e7a4:	0f 2f 05 1d 1f c3 01 	comiss 0x1c31f1d(%rip),%xmm0        # 0x1821d06c8
+   18059e7ab:	0f 86 fe 00 00 00    	jbe    0x18059e8af
+   18059e7b1:	48 8b bb a0 00 00 00 	mov    0xa0(%rbx),%rdi
+   18059e7b8:	0f 28 ce             	movaps %xmm6,%xmm1
+   18059e7bb:	f3 0f 10 15 bd 21 c3 	movss  0x1c321bd(%rip),%xmm2        # 0x1821d0980
+   18059e7c2:	01 
+   18059e7c3:	f3 0f 5e 8b b4 00 00 	divss  0xb4(%rbx),%xmm1
+   18059e7ca:	00 
+   18059e7cb:	f3 0f 58 8b c8 00 00 	addss  0xc8(%rbx),%xmm1
+   18059e7d2:	00 
+   18059e7d3:	48 85 ff             	test   %rdi,%rdi
+   18059e7d6:	0f 84 e3 00 00 00    	je     0x18059e8bf
+   18059e7dc:	48 8b 05 fd 56 fc 01 	mov    0x1fc56fd(%rip),%rax        # 0x182563ee0
+   18059e7e3:	0f 28 c2             	movaps %xmm2,%xmm0
+   18059e7e6:	0f 14 c2             	unpcklps %xmm2,%xmm0
+   18059e7e9:	f2 0f 11 44 24 20    	movsd  %xmm0,0x20(%rsp)
+   18059e7ef:	f3 0f 11 4c 24 28    	movss  %xmm1,0x28(%rsp)
+   18059e7f5:	48 85 c0             	test   %rax,%rax
+   18059e7f8:	75 1c                	jne    0x18059e816
+   18059e7fa:	48 8d 0d 8f 00 7f 01 	lea    0x17f008f(%rip),%rcx        # 0x181d8e890
+   18059e801:	e8 fa d5 c7 ff       	call   0x18021be00
+   18059e806:	48 85 c0             	test   %rax,%rax
+   18059e809:	0f 84 b6 00 00 00    	je     0x18059e8c5
+   18059e80f:	48 89 05 ca 56 fc 01 	mov    %rax,0x1fc56ca(%rip)        # 0x182563ee0
+   18059e816:	48 8d 54 24 20       	lea    0x20(%rsp),%rdx
+   18059e81b:	48 8b cf             	mov    %rdi,%rcx
+   18059e81e:	ff d0                	call   *%rax
+   18059e820:	80 bb bc 00 00 00 00 	cmpb   $0x0,0xbc(%rbx)
+   18059e827:	0f 28 c6             	movaps %xmm6,%xmm0
+   18059e82a:	f3 0f 5e 83 b4 00 00 	divss  0xb4(%rbx),%xmm0
+   18059e831:	00 
+   18059e832:	f3 0f 10 8b cc 00 00 	movss  0xcc(%rbx),%xmm1
+   18059e839:	00 
+   18059e83a:	0f 57 db             	xorps  %xmm3,%xmm3
+   18059e83d:	f3 0f 59 83 b8 00 00 	mulss  0xb8(%rbx),%xmm0
+   18059e844:	00 
+   18059e845:	74 05                	je     0x18059e84c
+   18059e847:	0f 57 d2             	xorps  %xmm2,%xmm2
+   18059e84a:	eb 03                	jmp    0x18059e84f
+   18059e84c:	0f 28 d6             	movaps %xmm6,%xmm2
+   18059e84f:	48 8b bb a0 00 00 00 	mov    0xa0(%rbx),%rdi
+   18059e856:	f3 0f 58 c8          	addss  %xmm0,%xmm1
+   18059e85a:	f3 0f 58 ca          	addss  %xmm2,%xmm1
+   18059e85e:	48 85 ff             	test   %rdi,%rdi
+   18059e861:	0f 84 8c 00 00 00    	je     0x18059e8f3
+   18059e867:	48 8b 05 42 56 fc 01 	mov    0x1fc5642(%rip),%rax        # 0x182563eb0
+   18059e86e:	0f 57 c0             	xorps  %xmm0,%xmm0
+   18059e871:	0f 14 c3             	unpcklps %xmm3,%xmm0
+   18059e874:	f2 0f 11 44 24 30    	movsd  %xmm0,0x30(%rsp)
+   18059e87a:	f3 0f 11 4c 24 38    	movss  %xmm1,0x38(%rsp)
+   18059e880:	48 85 c0             	test   %rax,%rax
+   18059e883:	75 18                	jne    0x18059e89d
+   18059e885:	48 8d 0d e4 02 7f 01 	lea    0x17f02e4(%rip),%rcx        # 0x181d8eb70
+   18059e88c:	e8 6f d5 c7 ff       	call   0x18021be00
+   18059e891:	48 85 c0             	test   %rax,%rax
+   18059e894:	74 46                	je     0x18059e8dc
+   18059e896:	48 89 05 13 56 fc 01 	mov    %rax,0x1fc5613(%rip)        # 0x182563eb0
+   18059e89d:	48 8d 54 24 30       	lea    0x30(%rsp),%rdx
+   18059e8a2:	48 8b cf             	mov    %rdi,%rcx
+   18059e8a5:	ff d0                	call   *%rax
+   18059e8a7:	f3 0f 11 b3 d0 00 00 	movss  %xmm6,0xd0(%rbx)
+   18059e8ae:	00 
+   18059e8af:	48 8b 5c 24 60       	mov    0x60(%rsp),%rbx
+   18059e8b4:	0f 28 74 24 40       	movaps 0x40(%rsp),%xmm6
+   18059e8b9:	48 83 c4 50          	add    $0x50,%rsp
+   18059e8bd:	5f                   	pop    %rdi
+   18059e8be:	c3                   	ret
+   18059e8bf:	e8 5c ad cc ff       	call   0x180269620
+   18059e8c4:	cc                   	int3
+   18059e8c5:	48 8d 0d c4 ff 7e 01 	lea    0x17effc4(%rip),%rcx        # 0x181d8e890
+   18059e8cc:	e8 4f d1 c7 ff       	call   0x18021ba20
+   18059e8d1:	48 8b c8             	mov    %rax,%rcx
+   18059e8d4:	33 d2                	xor    %edx,%edx
+   18059e8d6:	e8 35 b4 c7 ff       	call   0x180219d10
+   18059e8db:	cc                   	int3
+   18059e8dc:	48 8d 0d 8d 02 7f 01 	lea    0x17f028d(%rip),%rcx        # 0x181d8eb70
+   18059e8e3:	e8 38 d1 c7 ff       	call   0x18021ba20
+   18059e8e8:	48 8b c8             	mov    %rax,%rcx
+   18059e8eb:	33 d2                	xor    %edx,%edx
+   18059e8ed:	e8 1e b4 c7 ff       	call   0x180219d10
+   18059e8f2:	cc                   	int3
+   18059e8f3:	e8 28 ad cc ff       	call   0x180269620
+   18059e8f8:	cc                   	int3
+   18059e8f9:	cc                   	int3
+   18059e8fa:	cc                   	int3
+   18059e8fb:	cc                   	int3
+   18059e8fc:	cc                   	int3
+   18059e8fd:	cc                   	int3
+   18059e8fe:	cc                   	int3
+   18059e8ff:	cc                   	int3
+   18059e900:	48 89 5c 24 08       	mov    %rbx,0x8(%rsp)
+   18059e905:	57                   	push   %rdi
+   18059e906:	48 81 ec 80 00 00 00 	sub    $0x80,%rsp
+   18059e90d:	48 8b b9 98 00 00 00 	mov    0x98(%rcx),%rdi
+   18059e914:	48 8b d9             	mov    %rcx,%rbx
+   18059e917:	0f 29 74 24 70       	movaps %xmm6,0x70(%rsp)
+   18059e91c:	0f 29 7c 24 60       	movaps %xmm7,0x60(%rsp)
+   18059e921:	44 0f 29 44 24 50    	movaps %xmm8,0x50(%rsp)
+   18059e927:	48 85 ff             	test   %rdi,%rdi
+   18059e92a:	0f 84 84 01 00 00    	je     0x18059eab4
+   18059e930:	8b 81 b0 00 00 00    	mov    0xb0(%rcx),%eax
+   18059e936:	f2 0f 10 81 a8 00 00 	movsd  0xa8(%rcx),%xmm0
+   18059e93d:	00 
+   18059e93e:	89 44 24 48          	mov    %eax,0x48(%rsp)
+   18059e942:	33 c0                	xor    %eax,%eax
+   18059e944:	48 89 44 24 30       	mov    %rax,0x30(%rsp)
+   18059e949:	89 44 24 38          	mov    %eax,0x38(%rsp)
+   18059e94d:	48 8b 05 cc 55 fc 01 	mov    0x1fc55cc(%rip),%rax        # 0x182563f20
+   18059e954:	f2 0f 11 44 24 40    	movsd  %xmm0,0x40(%rsp)
+   18059e95a:	48 85 c0             	test   %rax,%rax
+   18059e95d:	75 1c                	jne    0x18059e97b
+   18059e95f:	48 8d 0d ca 05 7f 01 	lea    0x17f05ca(%rip),%rcx        # 0x181d8ef30
+   18059e966:	e8 95 d4 c7 ff       	call   0x18021be00
+   18059e96b:	48 85 c0             	test   %rax,%rax
+   18059e96e:	0f 84 46 01 00 00    	je     0x18059eaba
+   18059e974:	48 89 05 a5 55 fc 01 	mov    %rax,0x1fc55a5(%rip)        # 0x182563f20
+   18059e97b:	4c 8d 44 24 30       	lea    0x30(%rsp),%r8
+   18059e980:	48 8b cf             	mov    %rdi,%rcx
+   18059e983:	48 8d 54 24 40       	lea    0x40(%rsp),%rdx
+   18059e988:	ff d0                	call   *%rax
+   18059e98a:	48 8b bb 90 00 00 00 	mov    0x90(%rbx),%rdi
+   18059e991:	48 85 ff             	test   %rdi,%rdi
+   18059e994:	0f 84 1a 01 00 00    	je     0x18059eab4
+   18059e99a:	33 c0                	xor    %eax,%eax
+   18059e99c:	48 89 44 24 20       	mov    %rax,0x20(%rsp)
+   18059e9a1:	89 44 24 28          	mov    %eax,0x28(%rsp)
+   18059e9a5:	48 8b 05 ec 54 fc 01 	mov    0x1fc54ec(%rip),%rax        # 0x182563e98
+   18059e9ac:	48 85 c0             	test   %rax,%rax
+   18059e9af:	75 1c                	jne    0x18059e9cd
+   18059e9b1:	48 8d 0d c8 00 7f 01 	lea    0x17f00c8(%rip),%rcx        # 0x181d8ea80
+   18059e9b8:	e8 43 d4 c7 ff       	call   0x18021be00
+   18059e9bd:	48 85 c0             	test   %rax,%rax
+   18059e9c0:	0f 84 0b 01 00 00    	je     0x18059ead1
+   18059e9c6:	48 89 05 cb 54 fc 01 	mov    %rax,0x1fc54cb(%rip)        # 0x182563e98
+   18059e9cd:	48 8d 54 24 20       	lea    0x20(%rsp),%rdx
+   18059e9d2:	48 8b cf             	mov    %rdi,%rcx
+   18059e9d5:	ff d0                	call   *%rax
+   18059e9d7:	f3 0f 10 74 24 20    	movss  0x20(%rsp),%xmm6
+   18059e9dd:	f3 0f 10 7c 24 24    	movss  0x24(%rsp),%xmm7
+   18059e9e3:	f3 44 0f 10 44 24 28 	movss  0x28(%rsp),%xmm8
+   18059e9ea:	f3 0f 5c 74 24 30    	subss  0x30(%rsp),%xmm6
+   18059e9f0:	f3 0f 5c 7c 24 34    	subss  0x34(%rsp),%xmm7
+   18059e9f6:	f3 44 0f 5c 44 24 38 	subss  0x38(%rsp),%xmm8
+   18059e9fd:	48 8b 93 90 00 00 00 	mov    0x90(%rbx),%rdx
+   18059ea04:	48 85 d2             	test   %rdx,%rdx
+   18059ea07:	0f 84 a7 00 00 00    	je     0x18059eab4
+   18059ea0d:	45 33 c0             	xor    %r8d,%r8d
+   18059ea10:	48 8d 4c 24 40       	lea    0x40(%rsp),%rcx
+   18059ea15:	44 38 83 bc 00 00 00 	cmp    %r8b,0xbc(%rbx)
+   18059ea1c:	74 14                	je     0x18059ea32
+   18059ea1e:	e8 cd 0b 44 01       	call   0x1819df5f0
+   18059ea23:	f2 0f 10 00          	movsd  (%rax),%xmm0
+   18059ea27:	8b 48 08             	mov    0x8(%rax),%ecx
+   18059ea2a:	f2 0f 11 44 24 30    	movsd  %xmm0,0x30(%rsp)
+   18059ea30:	eb 3c                	jmp    0x18059ea6e
+   18059ea32:	e8 b9 0b 44 01       	call   0x1819df5f0
+   18059ea37:	f3 0f 10 15 31 5e c3 	movss  0x1c35e31(%rip),%xmm2        # 0x1821d4870
+   18059ea3e:	01 
+   18059ea3f:	f2 0f 10 00          	movsd  (%rax),%xmm0
+   18059ea43:	f3 0f 10 48 08       	movss  0x8(%rax),%xmm1
+   18059ea48:	0f 28 d8             	movaps %xmm0,%xmm3
+   18059ea4b:	0f c6 db 55          	shufps $0x55,%xmm3,%xmm3
+   18059ea4f:	0f 28 e0             	movaps %xmm0,%xmm4
+   18059ea52:	0f 57 da             	xorps  %xmm2,%xmm3
+   18059ea55:	f2 0f 11 44 24 30    	movsd  %xmm0,0x30(%rsp)
+   18059ea5b:	0f 57 e2             	xorps  %xmm2,%xmm4
+   18059ea5e:	0f 57 ca             	xorps  %xmm2,%xmm1
+   18059ea61:	0f 14 e3             	unpcklps %xmm3,%xmm4
+   18059ea64:	f2 0f 11 64 24 30    	movsd  %xmm4,0x30(%rsp)
+   18059ea6a:	66 0f 7e c9          	movd   %xmm1,%ecx
+   18059ea6e:	f3 0f 10 44 24 30    	movss  0x30(%rsp),%xmm0
+   18059ea74:	f3 0f 10 4c 24 34    	movss  0x34(%rsp),%xmm1
+   18059ea7a:	48 8b 9c 24 90 00 00 	mov    0x90(%rsp),%rbx
+   18059ea81:	00 
+   18059ea82:	f3 0f 59 c6          	mulss  %xmm6,%xmm0
+   18059ea86:	0f 28 74 24 70       	movaps 0x70(%rsp),%xmm6
+   18059ea8b:	f3 0f 59 cf          	mulss  %xmm7,%xmm1
+   18059ea8f:	0f 28 7c 24 60       	movaps 0x60(%rsp),%xmm7
+   18059ea94:	66 0f 6e d1          	movd   %ecx,%xmm2
+   18059ea98:	f3 41 0f 59 d0       	mulss  %xmm8,%xmm2
+   18059ea9d:	f3 0f 58 c1          	addss  %xmm1,%xmm0
+   18059eaa1:	44 0f 28 44 24 50    	movaps 0x50(%rsp),%xmm8
+   18059eaa7:	f3 0f 58 c2          	addss  %xmm2,%xmm0
+   18059eaab:	48 81 c4 80 00 00 00 	add    $0x80,%rsp
+   18059eab2:	5f                   	pop    %rdi
+   18059eab3:	c3                   	ret
+   18059eab4:	e8 67 ab cc ff       	call   0x180269620
+   18059eab9:	cc                   	int3
+   18059eaba:	48 8d 0d 6f 04 7f 01 	lea    0x17f046f(%rip),%rcx        # 0x181d8ef30
+   18059eac1:	e8 5a cf c7 ff       	call   0x18021ba20
+   18059eac6:	48 8b c8             	mov    %rax,%rcx
+   18059eac9:	33 d2                	xor    %edx,%edx
+   18059eacb:	e8 40 b2 c7 ff       	call   0x180219d10
+   18059ead0:	cc                   	int3
+   18059ead1:	48 8d 0d a8 ff 7e 01 	lea    0x17effa8(%rip),%rcx        # 0x181d8ea80
+   18059ead8:	e8 43 cf c7 ff       	call   0x18021ba20
+   18059eadd:	48 8b c8             	mov    %rax,%rcx
+   18059eae0:	33 d2                	xor    %edx,%edx
+   18059eae2:	e8 29 b2 c7 ff       	call   0x180219d10
+   18059eae7:	cc                   	int3
+   18059eae8:	cc                   	int3
+   18059eae9:	cc                   	int3
+   18059eaea:	cc                   	int3
+   18059eaeb:	cc                   	int3
+   18059eaec:	cc                   	int3
+   18059eaed:	cc                   	int3
+   18059eaee:	cc                   	int3
+   18059eaef:	cc                   	int3

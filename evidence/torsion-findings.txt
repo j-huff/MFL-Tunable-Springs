@@ -1,0 +1,19 @@
+Torsion analysis for SHA256 c687618a07b873008a1b045f39d1d8157de35737efaa7138ccc586026200fdc8
+Local artifact evidence; not REA decompiler output.
+Metadata typeDef3194 HingeArticulation; typeDef3195 HingeSO.
+HingeArticulation .ctor token0x60004da RVA0x580a20, 5 explicit parameters.
+FixedUpdate token0x60004dc uses virtual slot5, native RVA0x303090.
+RVA0x303090 is shared by many unrelated no-op methods: do NOT globally detour it.
+HingeSO.Init RVA0x582c80 chooses HingeArticulation when articulation physics enabled.
+Constructor initializes self+0x60 ArticulationBody. Part definition id self+0x10, HingeSO self+0x18.
+HingeSO applySpring+0xfc, springStiffness+0x100, springDamping+0x104.
+Constructor RVA0x58188a onwards loads xDrive, sets stiffness/damping from SO, forceLimit=stiffness,target=0.
+SetDriveSpring RVA0x581c10 corroborates exact offsets.
+Same xDrive getter/setter icall cache slots as linear springs:0x2564d88/0x2564d90.
+Serialized assets exact pathIDs99992 Medium(id65)20000/100;99993 Light(id66)5000/20;99994 Heavy(id67)50000/100.
+Il2CppClass vtable header0x138 and slot5 at0x188 confirmed by read-only live process memory of Spring class: class0x31ead080+0x188 => GameAssembly base0x6ffff7ff0000+0x59e690. Remaining virtual methods at0x138,0x148,etc correspond to compiled class methods. Hinge metadata slot5 confirmed separately.
+Mod validates HingeArticulation slot pointer equals shared no-op AND method metadata equals class_get_method_from_name(FixedUpdate,1) before replacing that class slot. Captures original and filters IDs65/66/67.
+ArticulationReducedSpace metadata: fixed float x[3],int dofCount. Joint position injected native accessor string exists in GameAssembly; position documented radians for angular motion.
+Torsion angular velocity uses shortest angular delta / elapsed Unity fixedTimeAsDouble. Winding means angle error relative to xDrive.target moves away from zero; unwinding toward zero. Drive target is degrees, joint coordinate radians. High/low crossover rad/s, default0.5.
+Tests: winding both rotation signs, target conversion, +/-pi wraparound, invalid time/first sample, all four damping coefficients and transition blend.
+Runtime torsion validation pending restart; linear v2 telemetry observed with valid shaft speed and distinct damping.

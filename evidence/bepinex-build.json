@@ -1,0 +1,8 @@
+{
+  "loader_url": "https://builds.bepinex.dev/projects/bepinex_be/791/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.791%2Bb782da4.zip",
+  "sha256": {
+    "downloads/BepInEx-IL2CPP-win-x64-be791.zip": "bb1c510909b69522733791f3a0817a487379a52da6468a492f1c9c19b3ec6f9a",
+    "bepinex/bin/Release/net6.0/MarsFirstLogistics.SpringTuner.dll": "a6586d2324a6660458285681d31e6dd2d02abcc54e5120622441fdd42d0d7fae",
+    "dist/SpringTuner-BepInEx.zip": "98647a5178b5a0fe6b38fe8791a5c4c39df50442044b0f4e29f7521347b2dbd7"
+  }
+}

@@ -1,0 +1,81 @@
+Mars First Logistics spring investigation (static local evidence)
+GameAssembly.dll SHA256 c687618a07b873008a1b045f39d1d8157de35737efaa7138ccc586026200fdc8
+Metadata schema version31, 9,949,344 bytes; parser /tmp/mfl_metadata.py based on Perfare/Il2CppDumper MetadataClass.cs v31 layout (https://raw.githubusercontent.com/Perfare/Il2CppDumper/master/Il2CppDumper/Il2Cpp/MetadataClass.cs).
+No runtime execution or observation performed by this investigation; no REA Evidence IDs generated. Findings from direct metadata decode and GNU objdump, plus UnityPy asset object boundaries/raw payloads.
+
+Spring typeDef index3239, byvalTypeIndex17357, parent ArticulationBodyPart (typeDef3170).
+SpringSO typeDef3240 byval17358, parent PartSO(typeDef3219).
+Assembly-CSharp.dll codegen module VA0x181d9ea90; method count0x1aa0, methodPointers VA0x1823e0a10.
+Spring methods (token, VA):
+.ctor 0x60005f7 0x18059da90
+CreateJoint 0x60005f8 0x18059e240
+FixedUpdate 0x60005f9 0x18059e690
+UpdateResizableTransform 0x60005fa 0x18059e6c0
+CalcCurrDist 0x60005fb 0x18059e900
+CalcPositionFromDist 0x60005fc 0x18059eaf0
+WriteState 0x60005fd 0x18059ec60
+ReadState 0x60005fe 0x18059ecf0
+SpringSO.Init 0x60005ff 0x18059ef70
+SpringSO.ctor 0x6000600 0x18059f030
+
+Spring instance offsets:
+0x10 int id (inherited Part)
+0x18 pointer partDef (SpringSO, inherited Part)
+0x20 noderef
+0x28 GameObject go
+0x30 vehicle
+0x60 ArticulationBody articulationBody
+0x90 mainTransform
+0x98 parentTransform
+0xa0 resizeTransform
+0xa8 attachmentOffset Vector3
+0xb4 float length
+0xb8 float zOffset
+0xbc bool flipFixed
+0xc0 float minExtent
+0xc4 float maxExtent
+0xc8 float startZScale
+0xcc float startZOffset
+0xd0 float lastUpdateDist
+Part constructor VA0x180587050 establishes id from noderef+0x10 and calls PartSO.Find(id,&this.partDef).
+
+SpringSO instance floats:
+0xd8 spring
+0xdc damper
+0xe0 length
+0xe4 zOffset
+0xe8 minExtent
+0xec maxExtent
+0xf0 initialTargetDist
+
+CreateJoint sets ArticulationBody prismatic joint, X limited Y/Z locked, anchor rotation, xDrive:
+lower/upper limits=minExtent/maxExtent + initialTargetDist; if flipFixed lower=-max,upper=-min,target=-initialTargetDist.
+stiffness=spring; damping=damper; forceLimit=spring.
+ArticulationDrive (32 bytes): lowerLimit+0,upperLimit+4,stiffness+8,damping+12,forceLimit+16,target+20,targetVelocity+24,driveType int+28.
+Cached icall slot VA0x182564d88 -> UnityEngine.ArticulationBody::get_xDrive_Injected(UnityEngine.ArticulationDrive&)
+Cached icall slot VA0x182564d90 -> UnityEngine.ArticulationBody::set_xDrive_Injected(UnityEngine.ArticulationDrive&)
+Calling convention windows x64: rcx body,rdx struct pointer. Slots may be null until resolved by first CreateJoint.
+FixedUpdate calls CalcCurrDist then UpdateResizableTransform only. Candidate patch hook for physics parameter updates without custom force implementation.
+CalcCurrDist=(main.position-parent.TransformPoint(attachmentOffset)) dot (flipFixed? main.forward:-main.forward).
+UpdateResizableTransform computes local z scale=startZScale+currDist/length. Thus increasing distance means extension, decreasing means compression, already normalized for flipFixed. This sign inference is strongly supported by scale calculation but not runtime validated.
+lastUpdateDist only refreshed when visual change exceeds epsilon; it is NOT a physics previous distance sample. Track own previous distance or use appropriately signed articulation velocity.
+
+Asset-derived identification/defaults:
+sharedassets0.assets raw MonoBehaviour objects, m_Name at raw+28 length prefix, ID immediately after 4-aligned name, last28bytes seven serialized SpringSO floats.
+Light: IDs59,141,142, stiffness400,damping30,length2.6,zOffset-0.4,minExtent-2.4,maxExtent3.0; initialTargetDist0,+1.5,-1.5 respectively.
+Medium: IDs58,139,140, stiffness1000,damping60,length2.6,zOffset-0.4,minExtent-2.4,maxExtent3.0; initialTargetDist0,+1.5,-1.5 respectively.
+Heavy: IDs60,143,144, stiffness4000,damping200,length1.6,zOffset-0.4,minExtent-1.4,maxExtent2.0; initialTargetDist0,+1,-1 respectively.
+PathIDs: Medium99985, Light99986, Heavy99987; MediumCompressed99934,MediumExtended99936,LightCompressed99937,LightExtended99938,HeavyCompressed99939,HeavyExtended99940.
+Torsion spring IDs65,66,67 belong to separate classes and are excluded.
+
+Unknowns: practical stability of extreme stiffness/damping, physics callback timing in actual running session, and runtime attachment/backend support. Game version string from resources.assets v202610030813.
+
+Additional ABI review:
+Spring.FixedUpdate explicit metadata parameter 'frame' typeIndex23125 (Frame typeDef3508); use void(self,Frame*,MethodInfo*) Windows x64. The current generated body ignores Frame and MethodInfo, but hooks should preserve all arguments. CalcCurrDist has zero explicit parameters, returns Single: float(self,MethodInfo*).
+For xDrive injected icalls, use void(ArticulationBody* managed_wrapper, ArticulationDrive* value). Exact CreateJoint instruction sequence loads this+0x60 straight into rcx and calls cached getter/setter; there is NO +0x10 cached-native-pointer dereference at this call site. Therefore do not pass the native component pointer from managed_wrapper+0x10. No MethodInfo passed to the injected native functions.
+Part id confirmed definition ID by PartSO.Find disassembly: signed ID indexes global byId array at +0x20+id*8; thus id is not a vehicle instance serial number.
+Drive fields are seven contiguous floats followed by int driveType. Both getter and setter copy two full 16-byte chunks =32bytes. Preserve lower/upper limits,target,targetVelocity,driveType. Stock forceLimit is exactly original stiffness. Raising stiffness while retaining stock force limit saturates force; matching forceLimit to tuned stiffness preserves stock coupling. But setting stiffness=0 and forceLimit=0 also disables all damping force, so independent damping at zero stiffness requires keeping a positive force limit. Expose/document a force-limit choice or preserve original cap for zero-stiffness use.
+
+Recorded source identities:
+metadata SHA256 67ab29ca1e80e3d3fc7d92089091b623d3e52bce19c6b0e3d1647956c5cadca7
+sharedassets0.assets SHA256 4403d00a6f79883b3e3171d98d595c1132ae8375498675f7280f762847d47d3c

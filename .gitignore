@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+*.log
+*.pdb
+*.lib
+status.json
+status.tmp
+.tuning-*
+.dotnet/
+downloads/
+tools/
+bepinex/**/bin/
+bepinex/**/obj/
+dist/
+*.bepinex.tmp
+# Generated/game-specific binaries and recovered bindings
+*.dll
+evidence/interop/

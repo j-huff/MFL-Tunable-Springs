@@ -1,0 +1,46 @@
+
+GameAssembly.dll:     file format pei-x86-64
+
+
+Disassembly of section il2cpp:
+
+0000000180587050 <il2cpp+0x287050>:
+   180587050:	48 89 5c 24 10       	mov    %rbx,0x10(%rsp)
+   180587055:	48 89 6c 24 18       	mov    %rbp,0x18(%rsp)
+   18058705a:	57                   	push   %rdi
+   18058705b:	48 83 ec 20          	sub    $0x20,%rsp
+   18058705f:	80 3d 3c 0f fd 01 00 	cmpb   $0x0,0x1fd0f3c(%rip)        # 0x182557fa2
+   180587066:	49 8b f8             	mov    %r8,%rdi
+   180587069:	48 8b ea             	mov    %rdx,%rbp
+   18058706c:	48 8b d9             	mov    %rcx,%rbx
+   18058706f:	75 18                	jne    0x180587089
+   180587071:	48 8d 0d 08 2c eb 01 	lea    0x1eb2c08(%rip),%rcx        # 0x182439c80
+   180587078:	e8 b3 80 cb ff       	call   0x18023f130
+   18058707d:	f0 83 0c 24 00       	lock orl $0x0,(%rsp)
+   180587082:	c6 05 19 0f fd 01 01 	movb   $0x1,0x1fd0f19(%rip)        # 0x182557fa2
+   180587089:	48 85 ff             	test   %rdi,%rdi
+   18058708c:	74 54                	je     0x1805870e2
+   18058708e:	8b 47 10             	mov    0x10(%rdi),%eax
+   180587091:	89 43 10             	mov    %eax,0x10(%rbx)
+   180587094:	48 8b 0d e5 2b eb 01 	mov    0x1eb2be5(%rip),%rcx        # 0x182439c80
+   18058709b:	48 89 74 24 30       	mov    %rsi,0x30(%rsp)
+   1805870a0:	8b 77 10             	mov    0x10(%rdi),%esi
+   1805870a3:	83 b9 e0 00 00 00 00 	cmpl   $0x0,0xe0(%rcx)
+   1805870aa:	75 05                	jne    0x1805870b1
+   1805870ac:	e8 6f 8c d2 ff       	call   0x1802afd20
+   1805870b1:	48 8d 53 18          	lea    0x18(%rbx),%rdx
+   1805870b5:	45 33 c0             	xor    %r8d,%r8d
+   1805870b8:	8b ce                	mov    %esi,%ecx
+   1805870ba:	e8 61 6c 00 00       	call   0x18058dd20
+   1805870bf:	48 8b 74 24 30       	mov    0x30(%rsp),%rsi
+   1805870c4:	33 c0                	xor    %eax,%eax
+   1805870c6:	48 89 6b 30          	mov    %rbp,0x30(%rbx)
+   1805870ca:	48 8b 6c 24 40       	mov    0x40(%rsp),%rbp
+   1805870cf:	48 89 43 38          	mov    %rax,0x38(%rbx)
+   1805870d3:	48 89 7b 20          	mov    %rdi,0x20(%rbx)
+   1805870d7:	48 8b 5c 24 38       	mov    0x38(%rsp),%rbx
+   1805870dc:	48 83 c4 20          	add    $0x20,%rsp
+   1805870e0:	5f                   	pop    %rdi
+   1805870e1:	c3                   	ret
+   1805870e2:	e8 39 25 ce ff       	call   0x180269620
+   1805870e7:	cc                   	int3

@@ -16,3 +16,6 @@ dist/
 # Generated/game-specific binaries and recovered bindings
 *.dll
 evidence/interop/
+.run-integration-checks
+core
+core.*

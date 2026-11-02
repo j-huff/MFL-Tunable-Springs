@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>MarsFirstLogistics.SpringTuner</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>2.1.1</Version>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -10,7 +10,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Plugin.cs" /><Compile Include="Tuning.cs" />
+    <Compile Include="Plugin.cs" /><Compile Include="Tuning.cs" /><Compile Include="NodeSettings.cs" /><Compile Include="Persistence.cs" /><Compile Include="SaveTrailer.cs" /><Compile Include="MenuTuning.cs" /><Compile Include="IntegrationChecks.cs" />
     <Reference Include="BepInEx.Core"><HintPath>$(GameDir)/BepInEx/core/BepInEx.Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="BepInEx.Unity.IL2CPP"><HintPath>$(GameDir)/BepInEx/core/BepInEx.Unity.IL2CPP.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Il2CppInterop.Runtime"><HintPath>$(GameDir)/BepInEx/core/Il2CppInterop.Runtime.dll</HintPath><Private>false</Private></Reference>
@@ -19,6 +19,9 @@
     <Reference Include="Il2Cppmscorlib"><HintPath>$(GameDir)/BepInEx/interop/Il2Cppmscorlib.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameDir)/BepInEx/interop/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(GameDir)/BepInEx/interop/UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.TextMeshPro"><HintPath>$(GameDir)/BepInEx/interop/Unity.TextMeshPro.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(GameDir)/BepInEx/interop/UnityEngine.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="I2"><HintPath>$(GameDir)/BepInEx/interop/I2.dll</HintPath><Private>false</Private></Reference>
   </ItemGroup>
   <Target Name="CheckInterop" BeforeTargets="ResolveReferences" Condition="!Exists('$(GameDir)/BepInEx/interop/Assembly-CSharp.dll')">
     <Error Text="Run this game with BepInEx 6 IL2CPP once to generate BepInEx/interop, then rebuild." />

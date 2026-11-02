@@ -1,0 +1,58 @@
+Saved designs persistence failure investigation, 2026-11-01
+Read-only investigation; no user saves modified.
+
+CONFIRMED TWO FAILURES
+1. VehicleEditor.SaveVehicleToSlot bypasses Node.WriteVehicleSave, directly serializing version, WriteNodeBinary, optional name. Existing save hook never executes for this route.
+2. PNG transport extracts all transparent pixels, including unused padding, so the reconstructed MemBuf.len is far beyond the true trailer end. Footer-at-buf.len decoder fails even if writer appends trailer correctly.
+
+Native call path (VAs GameAssembly.dll image base0x180000000):
+VehicleEditor.SaveVehicleToSlot(int slot), void,0x180462770/token0x6000fc1:
+ select savedVehicleInfos[slot-1] (slots1..100), info.buf at0x10.
+ Clear info.buf.len/pos at0x18046308e and0x180463091.
+ Load CURRENT EDITOR vehicleTree at0x180463094.
+ MemBuf.WriteUShort(5) call0x1804630c1.
+ Node.WriteNodeBinary(buf) call0x1804630cf (target0x18047e5d0).
+ If info.name!=null, WriteUInt(0xffffffff)0x1804630e8, WriteString(name)0x1804630f6.
+ Then update button text and part counts, call WriteVehiclePNG at0x180463169.
+ It never calls Node.WriteVehicleSave or ToBase64.
+
+VehicleEditor.WriteVehiclePNG(int slot,VehicleEditor.SaveVehicleInfo info,UnityEngine.Texture2D tex), void,0x1804633c0/token0x6000fc2:
+ Note generated signature uses nested SaveVehicleInfo (defined inside VehicleEditor, typeDef3526).
+ Reads tex.GetRawTextureData result then info.buf bytes and len.
+ Iterates four-byte pixels. If first raw byte<5, sets first byte1 and inserts up to three buf bytes into remaining channels. Stops when buf bytes exhausted OR pixel array exhausted. Native silently truncates if capacity exhausted.
+ Capacity =3 * number of raw pixels whose first byte<5.
+ No explicit embedded stream length is stored. Last partially filled pixel retains unused bytes. It can also mark an extra pixel1 after buffer exhaustion, since marker set happens before len test.
+ Encodes image and writes slot PNG path via Save.GetVehiclePath(slot)0x1805ce980 and Save.Write...0x1805d0a30.
+ buf is reused cached slot state; native encoder does not clear or truncate it. Appending to info.buf before this method updates both same-session slot state and disk payload.
+
+VehicleEditor.LoadSavedVehicle(Game g,int slot), bool,0x180457410/token0x6000f8d:
+ Uses cached savedVehicleInfos[slot-1].buf, calls LoadVehicleFromBuf at0x1804574fb (target0x1804576e0).
+ VehicleEditor.LoadVehicleFromBuf(Game g,MemBuf data,out string name), bool: calls LoadSavedVehicleTreeFromBuf; PushUndoStack; installs returned tree directly as editor.vehicleTree (no extra cloning loss).
+ VehicleEditor.LoadSavedVehicleTreeFromBuf(MemBuf data,out string name), Node,0x180457870/token0x6000f90:
+ Resets data.pos=0 at0x1804578ab. Calls Node.ReadSavedVehicle at0x1804578cb. EXISTING READ HOOK IS REACHED.
+
+PNG disk loading:
+VehicleEditor.LoadVehicleInfoFromBytes(SaveVehicleInfo info,Il2CppStructArray<byte> bytes), void,0x180461eb0/token0x6000fbd:
+ Calls LoadVehicleDataIntoBuffer(bytes,info.buf); then LoadSavedVehicleTreeFromBuf to inspect part counts/name. On success leaves full reconstructed buf intact, compatible=true. On failure clears len/pos and metadata.
+VehicleEditor.LoadVehicleDataIntoBuffer(Il2CppStructArray<byte> bytes,MemBuf buf), void,0x180461fa0/token0x6000fbe:
+ Loads PNG into editor temporary texture, gets raw texture data, resets buf.len/pos0.
+ Iterates ALL four-byte pixels. For each first raw byte<=1, writes other THREE bytes into buf, even pixels unused by encoder. Does not inspect vehicle parse endpoint or any trailer. Hence substantial trailing padding.
+
+Additional rewrite path must preserve tuning:
+VehicleEditor.ResaveVehicle(int slot), void,0x180462110/token0x6000fbf:
+ At0x1804621d5 calls LoadSavedVehicleTreeFromBuf on selected info.buf, obtaining SAVED tree (not editor current tree).
+ Then clears same info.buf len/pos at0x1804621ea/1ee.
+ Direct version + WriteNodeBinary at0x180462221 + optional info.name.
+ Calls WriteVehiclePNG at0x180462263 using existing slot thumbnail texture.
+ Likely rename path, and signature/calls prove reserialization. Hooking WriteVehiclePNG with current editor root indiscriminately would substitute wrong tuning during this path.
+
+Recommended patch pair:
+- SaveVehicleToSlot prefix capture immutable tuning snapshot of editor.vehicleTree, scope by editor / call; finalizer clear scope.
+- ResaveVehicle prefix capture selected SAVED tree tuning from original cached info.buf before native clears it, preserving pos. Existing Node.ReadSavedVehicle decode hook can populate a temporary decoded root; Capture it immediately into pure snapshot. Alternatively scope ReadSavedVehicle observation during native ResaveVehicle, before the known buffer reset.
+- WriteVehiclePNG prefix, only within either scoped operation, append captured trailer to info.buf AFTER name has been written and BEFORE PNG encoding. Force append at buf.len (native serialization leaves pos=len but explicit robust). Avoid duplicate append on unrelated PNG updates; preserve native prefix and slot name. Check raw texture capacity before appending; if payload cannot fit do not silently claim saved tuning. Handling oversized payload via another representation would require explicit design.
+- Retain existing Node.ReadSavedVehicle postfix but change decoder to recognize a trailer beginning exactly at native consumed endpoint (or endpoint-4 for absent-name marker probe), with bounded forward footer search and digest validation. Allow arbitrary later PNG padding. Do not merely trim trailing zeros: footer/hash can contain zeros and padding can contain old payload/thumbnail data. Search bound MaxPayload+52 from native stream endpoint, candidate footer length/digest/topology must all validate. This also preserves existing footer v1 and regular base64 saves without migration.
+- Add tests that model image transport: three-byte padding, arbitrary large zero padding, stale nonzero data after valid footer, checksum-invalid candidate before valid footer, and capacity overflow. Live test must save, load another design, reload saved slot; then restart game to force PNG reconstruction, load again; rename/resave without loading target to ensure unrelated editor tree doesn't contaminate tuning.
+
+Read-only on-disk confirmation:
+Directory /home/john-huff/.local/share/Steam/steamapps/compatdata/1532200/pfx/drive_c/users/steamuser/AppData/LocalLow/Shape Shop/Mars First Logistics
+Most recent vehicle19.png mtime2026-11-01T19:55:24,512x512. Decoding PNG via Pillow and traversing rows bottom-to-top, RGB bytes of pixels alpha<=1 yields head050000000000ff000404..., exactly v5 vehicle data; reconstructed length666060. Last nonzero byte index378 (379 bytes). No MFLSPRINGTUNE001 or tuning JSON. This confirms save-hook bypass and ~665KB unused PNG padding in actual user file. vehicle100.png also no footer (mtime13:04:36), reconstructed574284 bytes.

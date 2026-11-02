@@ -1,82 +1,103 @@
-# Mars First Logistics Spring Tuner — BepInEx
+# Mars First Logistics Spring Tuner — in-game edition
 
-A BepInEx 6 IL2CPP plugin with a local browser control panel. It tunes Light/Medium/Heavy linear and torsion springs. Each type has stiffness, low/high compression damping, low/high rebound damping, and two crossover speeds. The dropdown edits one type at a time and retains unsaved edits across selections.
+BepInEx 6 IL2CPP plugin adding **per-part suspension tuning** to the game's **Configure controls** menu. Supports Light/Medium/Heavy Springs and Torsion Springs, including compressed/extended linear variants.
 
-## Installed setup
+The previous web-controlled version was committed before this rewrite: **`0df54b4`** in this `spring-tuner` Git repository. The legacy web panel and global tuning files have been removed from the current tree; they remain available in that commit.
 
-- Loader: **BepInEx 6.0.0-be.791+b782da4, Unity IL2CPP, Windows x64**. This is the Windows game running under Proton; do not use the Linux or Mono loader builds.
-- Plugin: `BepInEx/plugins/SpringTuner/MarsFirstLogistics.SpringTuner.dll`.
-- Panel/settings: `spring-tuner/panel.py`, `panel.html`, `tuning.txt`.
-- The previous standalone `version.dll` is backed up in `spring-tuner/legacy-native/` and is no longer loaded. Never run both implementations together.
+## Use
 
-Restart the game after installing/updating the plugin:
+1. Restart the game using `./spring-tuner/launch-game.sh`.
+2. Enter the vehicle editor and select **Configure controls**.
+3. Hover over a spring and use the normal **Configure controls** action shown by the game. The mod uses your existing keyboard/controller binding.
+4. Adjust the sliders in the existing part-controls popup:
+   - Stiffness
+   - Low-speed compression damping
+   - High-speed compression damping
+   - Low-speed rebound damping
+   - High-speed rebound damping
+   - Compression speed crossover
+   - Rebound speed crossover
+5. Close the popup normally. Changes belong to **that spring instance**, not every spring of its type. Slider edits in the popup are grouped into an undo step.
+
+**Apply All** copies the displayed settings to all matching springs on the current vehicle. It matches the spring family: Light, Medium and Heavy remain separate, torsion and linear remain separate, and compressed/extended variants count with their corresponding linear family. Other vehicles are unaffected. The bulk action is independently undoable. Clicking it plays the same sound as opening the controls menu, including when the matching springs already have those settings.
+
+**Reset spring** clears only the selected spring's override. Untuned parts retain stock behavior. There is no global enable or Apply button. Editing in the vehicle editor affects the rebuilt vehicle when returning to driving; if the same live node is present, tuning applies at its next physics tick.
+
+The sliders reuse the game's native settings-slider widgets and focus/input handling. The stock menu remains responsible for closing the popup and for all ordinary part controls. No browser, external panel, or separate in-game overlay is used.
+
+## Persistence
+
+Per-part values are attached to the native vehicle node using weak handles, avoiding native-pointer reuse and unintended lifetime retention. Tuning follows Saved designs → Save to slot / Load vehicle, base64 game-save paths, copies and duplicates. Slot saves include tuning in the design PNG; loading tolerates its extra pixel padding. Renaming a saved design preserves that design’s tuning. Undo/redo uses additional snapshots because the game serializes undo history differently.
+
+The save extension is a bounded, versioned JSON trailer with checksum and a topology signature. Original vehicle bytes, names and control bindings stay unchanged. Settings are matched by tree position, attachment slot and part ID, never by transient memory addresses. Invalid or mismatched extensions are ignored without preventing the base vehicle from loading.
+
+Saving a tuned vehicle **without the mod** loses the tuning extension; the base game ignores the extra data. Keep the mod enabled when editing/saving vehicles whose tuning you want to retain. Multiplayer synchronization has not been implemented or validated.
+
+## Install and launch
+
+Installed plugin: `BepInEx/plugins/SpringTuner/MarsFirstLogistics.SpringTuner.dll` (version 2.1.1).
+
+Loader used here: **BepInEx 6.0.0-be.791+b782da4, Unity IL2CPP, Windows x64**. This is a Windows game running under Proton, so use the Windows IL2CPP loader. [Official loader builds](https://builds.bepinex.dev/projects/bepinex_be) and [installation guide](https://docs.bepinex.dev/master/articles/user_guide/installation/unity_il2cpp.html).
 
 ```sh
 ./spring-tuner/launch-game.sh
-./spring-tuner/open-panel.sh
 ```
 
-The panel is at <http://127.0.0.1:8765>. Refresh an already-open panel after upgrading. Load and unpause a vehicle, choose a spring type, and use **Apply all changes live**. Settings persist when the panel closes. **Restore vanilla for all springs** restores the original drive values; **Load selected spring defaults** only changes that type's draft controls.
-
-For normal Steam launching, replace the old mod's `version=n,b` launch option with:
+For launching through Steam instead of the script:
 
 ```sh
 WINEDLLOVERRIDES="winhttp=n,b" %command%
 ```
 
-Preserve unrelated launch options. The supplied launch script already uses this override. It does not change Steam settings. Do not launch a second instance while the game is running.
+Do not restore the old standalone `version.dll`; running both backends is unsupported. Existing loader/source backups remain in `legacy-native/`.
 
-The first BepInEx launch generates `BepInEx/interop`; later launches use that cache. Check `BepInEx/LogOutput.log` for `Loading [Mars First Logistics Spring Tuner 1.0.0]` and `Spring Tuner loaded: six spring families`. The panel identifies the running backend as **BepInEx connected**. Old native feedback is explicitly labeled as old feedback.
-
-## Installing on another copy
-
-1. Install the [official BepInEx Unity IL2CPP Windows x64 build](https://builds.bepinex.dev/projects/bepinex_be) into the game directory. The validated loader package here is build 791. Follow the [IL2CPP installation guide](https://docs.bepinex.dev/master/articles/user_guide/installation/unity_il2cpp.html).
-2. Start the game once with the `winhttp` override to generate the interop assemblies, then close it.
-3. Extract `dist/SpringTuner-BepInEx.zip` into the game directory. It contains the plugin and companion panel, not BepInEx or any game assemblies. Existing `tuning.txt` is not overwritten.
-4. Start the game and panel as above.
-
-Only this game's current build is accepted: `GameAssembly.dll` SHA-256 `c687618a07b873008a1b045f39d1d8157de35737efaa7138ccc586026200fdc8`, Unity 2022.3.62f2. An unknown hash is rejected before patching. The plugin needs regeneration/revalidation after a game update. Only the game's articulation physics path is supported.
-
-## Implementation
-
-This is a C# `BasePlugin`, not a native DLL loaded by a wrapper. Harmony postfixes on `SpringSO.Init` and `HingeSO.Init` register fully constructed springs. An injected Unity `MonoBehaviour` updates their `ArticulationBody.xDrive` each physics tick. BepInEx/Il2CppInterop supplies the typed game bindings. There are no fixed-address detours, MinHook dependency, manual virtual-table writes, or process attachment.
-
-The plugin filters the supported part IDs, ignores ordinary hinges, removes destroyed bodies, and restores modified drive values on plugin unload. It records each drive's original stiffness, damping and force limit at creation. Disabling restores those exact values while preserving the current drive target, limits and mode. It is intended to be loaded at normal BepInEx startup, before vehicles are created; late hot-loading into an existing vehicle is not supported.
-
-Configuration is still the version-3 `spring-tuner/tuning.txt` protocol, six rows of seven values after the version/enabled flags. Versions 1 and 2 are also accepted and expanded with stock torsion defaults. Invalid config retains the last valid values and reports the error. Config polling and telemetry run on Unity's main thread, including while physics is paused; custom physics changes apply on the next physics tick. BepInEx logs errors to `BepInEx/LogOutput.log`.
+`dist/SpringTuner-BepInEx.zip` contains the plugin, launcher and this README. Extract into the game directory after installing BepInEx. It includes no game assemblies, saved vehicles, web server, or user tuning files. The first BepInEx launch generates its interop bindings.
 
 ## Physics
 
-| Type | Stock stiffness | Stock damping | Part IDs | Speed units |
-| --- | ---: | ---: | --- | --- |
-| Light Spring | 400 | 30 | 59, 141, 142 | game units/s |
-| Medium Spring | 1000 | 60 | 58, 139, 140 | game units/s |
-| Heavy Spring | 4000 | 200 | 60, 143, 144 | game units/s |
-| Light Torsion Spring | 5000 | 20 | 66 | rad/s |
-| Medium Torsion Spring | 20000 | 100 | 65 | rad/s |
-| Heavy Torsion Spring | 50000 | 100 | 67 | rad/s |
+Speed means suspension travel or rotation per simulation second, never vehicle speed. Linear compression is shortening; rebound is extension. Torsion compression is winding farther from the rest angle, rebound is unwinding toward it, in either direction. Torsion crossovers use **rad/s**; linear crossovers use game distance units/s.
 
-Speed is derived from spring travel or angular displacement per simulation second, never vehicle speed. Linear shortening selects compression; extension selects rebound. For torsion springs, compression means winding away from the rest angle and rebound means unwinding toward it, in either rotational direction. Angular wraparound is handled before differentiating. New/invalid samples or time gaps over 0.25 s give zero speed for that sample.
+Below 90% of the selected crossover the low-speed coefficient applies. Above 110%, the high-speed coefficient applies. Between them it blends linearly. This is a two-range damping-coefficient model, not a digressive force-slope model. New samples, long simulation gaps and invalid timing yield zero shaft speed; angular wraparound is handled. At rest the previous direction is retained.
 
-Each direction has a crossover (default 0.5). Below 90% of crossover the low-speed coefficient applies; above 110%, the high-speed coefficient applies. Between them the coefficient blends linearly. This is a two-range coefficient model, not a digressive high-speed force-slope model. At rest the previous direction is retained, using low-speed damping.
+The force/torque cap is `max(original force limit, chosen stiffness)`. Zero stiffness therefore still permits damping. Reset and plugin unload restore the original drive stiffness, damping and force cap while preserving its target, limits and mode.
 
-The force/torque cap is `max(original force limit, chosen stiffness)`, allowing damping with zero stiffness. Restoring vanilla restores the original cap. Controls accept stiffness 0–100000, damping 0–20000, and crossover 0.001–100. These input bounds do not guarantee stable behavior at extreme values.
+| Type | Stock stiffness | Stock damping |
+| --- | ---: | ---: |
+| Light Spring | 400 | 30 |
+| Medium Spring | 1000 | 60 |
+| Heavy Spring | 4000 | 200 |
+| Light Torsion Spring | 5000 | 20 |
+| Medium Torsion Spring | 20000 | 100 |
+| Heavy Torsion Spring | 50000 | 100 |
 
-## Build and tests
+Input ranges: stiffness 0–100000; damping 0–20000; crossover 0.001–100. These bounds do not guarantee physical stability at extremes.
 
-Requires .NET 8 SDK and the game's generated `BepInEx/interop` assemblies. The local SDK is available at `spring-tuner/.dotnet/dotnet`; `build.sh` also accepts a system-installed SDK. Source is in `spring-tuner/bepinex/`.
+## Compatibility and testing
+
+Supported `GameAssembly.dll` SHA-256:
+
+```
+c687618a07b873008a1b045f39d1d8157de35737efaa7138ccc586026200fdc8
+```
+
+This corresponds to the installed Unity 2022.3.62f2 build. Unknown builds are rejected before patching. Only articulation physics is supported. The plugin must load at normal BepInEx startup, before vehicles are created.
+
+Build: zero warnings/errors. Managed tests cover physics, separate same-ID part values, value-copy isolation, save-trailer round trips, untouched native bytes/names, legacy vehicles, topology checks, truncation and corrupt data. The user confirmed the native Configure controls popup opens successfully. A live slider-maximum rounding error was found and fixed; tests now validate every slider at 10,001 points including both endpoints. Apply All has vehicle-scope/type/variant selection tests. The user confirmed Apply All works. Version 2.1.1 fixes the Saved designs save path and padded PNG decoding; live slot save/load, the new sound, and undo/redo still require verification after restart. Investigation details and static evidence are in `evidence/`.
+
+An opt-in developer integration check is available: create `spring-tuner/.run-integration-checks` before launching. Once a spring is loaded, checks run on detached node copies and log their result. They do not alter live nodes or disk saves. The request file is consumed once. These cover native same-ID isolation, copy, clone, named saves and base64 saves; they do not replace visual/menu or undo/redo checks.
+
+## Build
+
+Requires .NET 8 SDK and this game's generated BepInEx interop assemblies. A local SDK is available in `.dotnet`; `build.sh` also finds a system SDK.
 
 ```sh
 ./spring-tuner/build.sh
-./spring-tuner/install-plugin.sh
 ./spring-tuner/.dotnet/dotnet run --project spring-tuner/bepinex/Tests/Tests.csproj -c Release
-python3 -m unittest discover -s spring-tuner -p 'test_*.py' -v
+./spring-tuner/install-plugin.sh
 ```
 
-Build uses local BepInEx/game assemblies as non-copying references; they are not bundled with the plugin. `GameDir` can be overridden using `dotnet build ... -p:GameDir=/absolute/game/path`.
+Source is in `bepinex/`. Inspect changes relative to the old mod using `git -C spring-tuner diff 0df54b4`. Build references game/loader assemblies without copying them into the plugin package.
 
-Validation so far: official BepInEx started and generated bindings successfully under Proton; plugin builds with zero warnings/errors; managed physics/migration tests and nine panel/API/dropdown tests pass. Live plugin/vehicle validation is pending the requested restart. Earlier native implementation tests and artifact analysis remain in `evidence/`; those are not claimed as validation of this rewrite.
+## Remove
 
-## Remove or disable
-
-Use **Restore vanilla for all springs**, close the game, and remove `BepInEx/plugins/SpringTuner`. Keep BepInEx if other mods use it. The companion panel/settings directory can be retained or removed separately. Original game executables, assets and saves were not patched. Do not restore the legacy native loader while the BepInEx plugin is installed.
+Close the game and remove `BepInEx/plugins/SpringTuner`. Keep BepInEx if other mods use it. Original executables/assets and saves are not patched on disk. Removing the mod leaves vanilla spring physics; preserve tuned saves separately if you intend to reinstall later.

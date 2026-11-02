@@ -1,5 +1,4 @@
 using MarsSpringTuner;
-using System.Globalization;
 void Check(bool ok,string name){if(!ok)throw new Exception(name);}
 void Near(float value,float expected,string name)=>Check(MathF.Abs(value-expected)<.001f,name);
 var row=new float[]{400,10,30,50,90,.5f,1};
@@ -18,13 +17,21 @@ Near(Damping.Coefficient(row,.5f,true),20,"compression transition");
 Near(Damping.Coefficient(row,.1f,false),50,"low rebound");
 Near(Damping.Coefficient(row,2,false),90,"high rebound");
 Near(Damping.Coefficient(row,1,false),70,"rebound transition");
-var legacy=Settings.Parse("1 1 411.1 30 368.6 1000 60 60 4000 200 200");
-Near(legacy.Springs[0][2],30,"v1 compression migration");Near(legacy.Springs[0][4],368.6f,"v1 rebound migration");
-Near(legacy.Springs[3][0],5000,"torsion defaults");
-string version3="3 1 "+string.Join(" ",legacy.Springs.SelectMany(x=>x).Select(x=>x.ToString(CultureInfo.InvariantCulture)));
-Check(Settings.Parse(version3).Enabled,"v3 roundtrip");
-foreach(string bad in new[]{"3 1",version3+" 1",version3.Replace("411.1","NaN"),version3.Replace("411.1","100001"),version3.Replace("0.5","0"),version3.Replace("3 1 ","3 2 ")}) {
- bool failed=false;try{Settings.Parse(bad);}catch(FormatException){failed=true;}Check(failed,"invalid config accepted");
-}
+Near(Settings.Defaults()[3][0],5000,"torsion defaults");
 Check(Damping.Kind(66)==3&&Damping.Kind(65)==4&&Damping.Kind(67)==5&&Damping.Kind(141)==0&&Damping.Kind(1)==-1,"part mapping");
-Console.WriteLine("Managed physics, six-family mapping, config migration and validation tests passed.");
+Console.WriteLine("Managed physics, six-family mapping, default-value tests passed.");
+
+PersistenceTests.Run();
+
+for(int index=0;index<7;index++)for(int step=0;step<=10000;step++) {
+    var values=Settings.Defaults()[0];values[index]=SliderScale.Decode(index,step/10000f);Settings.ValidateValues(values);
+}
+Near(SliderScale.Decode(5,1),100,"crossover maximum rounding");
+Near(SliderScale.Decode(5,0),.001f,"crossover minimum");
+var vehicle=new BulkNode(0,1,new[]{new BulkNode(1,59),new BulkNode(2,141),new BulkNode(3,58),new BulkNode(4,66),new BulkNode(5,1,new[]{new BulkNode(6,142)})});
+var otherVehicle=new BulkNode(7,1,new[]{new BulkNode(8,59)});
+var selected=BulkTuning.Matching(vehicle,59,n=>n.PartId,n=>n.Children,n=>n.Identity);
+Check(selected.Select(n=>n.Identity).Order().SequenceEqual(new long[]{1,2,6}),"bulk excludes other types/vehicles and includes matching variants");
+Check(BulkTuning.Matching(vehicle,66,n=>n.PartId,n=>n.Children,n=>n.Identity).Single().Identity==4,"torsion only bulk");
+Console.WriteLine("All slider endpoints/intermediate values and vehicle-scoped Apply All selection tests passed.");
+record BulkNode(long Identity,int PartId,BulkNode[] Children) {public BulkNode(long id,int part):this(id,part,Array.Empty<BulkNode>()) {}}

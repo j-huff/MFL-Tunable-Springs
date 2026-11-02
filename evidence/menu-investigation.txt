@@ -1,0 +1,64 @@
+Native Configure controls integration investigation (read-only), 2026-11-01
+
+Evidence: generated BepInEx/interop/Assembly-CSharp.dll bindings, original GameAssembly.dll native x64 disassembly, UnityPy read of Mars First Logistics_Data/level0. Native pointers image base 0x180000000. Generated wrappers and annotated disassembly excerpts in evidence/interop/. No running process or implementation mutated by this investigation.
+
+VehicleEditor patch points:
+HandleInputConfigTool(Game) token0x6000f31 RVA0x440390
+ShowPartSetControls(Game,Vehicle.Node) token0x6000f3f RVA0x442f50
+UpdatePartControlBinding(Vehicle.Node,int) token0x6000f40 RVA0x4439c0
+HandleSetPartControls(Game) token0x6000f43 RVA0x444580
+UpdatePartInfo(Game,int) RVA0x44de30
+UpdatePartInfoTextVisibility(bool,bool,bool) RVA0x44f3a0
+PushUndoStack() RVA0x461080
+
+HandleInputConfigTool controls eligibility is node.inputOverrides.Length > 0 (node+0x20 array, array+0x18 count), compared at VA0x180440626. It skips EditorSetControls command for no-controls springs. EditorSetControls numeric binding82 (0x52), Control.GetButtonUp RVA0x337e40, ShowPartSetControls called VA0x1804406b4..6c0. A postfix can replace no-controls tooltip and detect this command only for supported hoverNodeSelection, calling original ShowPartSetControls directly. Do not add dummy inputOverrides: unnecessary and changes native binding data/serialization.
+
+ShowPartSetControls safely handles empty inputOverrides, hides unused bindingButtons, sets native title, activates popup, PushModal(popup.transform), FocusTopLeftElem(), assigns setControlsNode last at VA0x180443801. Postfix can add custom children and refocus. Preserve original close lifecycle.
+
+Relevant editor fields/offsets:
+hoverNodeSelection +0xe0
+partControlsPopup +0x238
+partControlsPopupCloseButton +0x240
+partControlsTitleLocalize +0x248
+setControlsNode +0x250
+bindingButtons +0x258
+ autoReturnTickbox +0x260, suspensionTickbox +0x268
+partConfigBox +0x288, partConfigText +0x290 (world TextMeshPro, not UGUI)
+partConfigBoxBGRenderer +0x298, line +0x2a0, dot +0x2a8
+lastPartConfigNode +0x2b0
+
+HandleSetPartControls:
+Loops min(inputOverrides.Length,bindingButtons.Length); handles empty input array safely.
+Escape is Control.GetButtonUp(0x86); same close branch as CloseButton.Pressed().
+Close branch VA0x180445093 nulls setControlsNode, popup.SetActive(false), UIController.PopModal(), restores control flags, calls UpdateToolVisibility(g), clears inputPrompt.
+AutoReturn tickbox and Suspension tickbox poll valueChanged even when hidden: clear flags when showing custom panel. Changes clear flag, PushUndoStack(), then mutate node.autoReturn. Suspension checkbox writes inverse value. Do not reuse these instances as custom fields.
+
+Native controls:
+UIElement.OnEnable = UIController.ElemEnabled RVA0x3e4f90; unconditionally adds object to global element list. Let Unity invoke OnEnable, do not call manually (duplicates). OnDisable unregisters (RVA0x3e6750).
+UISlider.Init RVA0x3f64b0 calls UIElement.Init then resolves Slider child and Renderer. Call Init on clones after configuring hierarchy; no manual registration.
+UISlider.SetValue RVA0x3f7290 writes value and calls UpdateSlider, does not clamp or set wasChange. Keep normalized0..1 values explicitly.
+UISlider.WasChanged(out float) RVA0x3f72a0 returns value only when wasChange=true and resets flag. Supports native mouse and keyboard/gamepad UIController input.
+MainMenu exposes masterVolumeSlider/sfxVolumeSlider/musicVolumeSlider/uiVolumeSlider/fovSlider; clone full UISlider.gameObject root, not Slider child mesh. MainMenu slider root label has I2.Localize: remove or disable on clone before custom text.
+UIInputField wraps TMP_InputField and native UIElement, available on ModalMessage.inputField if numeric text input later desired; TMP field has CanvasRenderer, needs existing canvas ancestor or world-space canvas. Mesh UISlider has no canvas requirement.
+
+Scene geometry (level0 exact serialized transforms):
+PartControlsPopup transform2372, GameObject353, localPosition(0,1,-25),scale1.
+Direct BG transform2454 localPosition(0,-1.125,1),scale(6,5.5,1).
+DimOverlay transform2431 localPosition(0,-.69,2),scale(100,100,1).
+CloseButton transform2418 localPosition(0,-3.4375,0),scale1; child BG scale(2,.5,1).
+Title RectTransform6823 anchoredPosition(0,1.375),sizeDelta(60,5),pivot(.5,.5),scale(.0857518,.0857518,.0857518),z=-1.
+BindingsHeader RectTransform6834 anchoredPosition(-2.8044,.875),sizeDelta(65.51,5),pivot(0,.5),same scale,z=-1.
+Native binding rows local y1.125,.5,-.125,-.75,-1.375,-2; their BG is child at x4.125,y-.75,scale(5.75,.5,1).
+AutoReturn localPosition(-1.91,-1.79,0); Suspension(-1.91,-2.75,0).
+Suggested spring panel: widen BG to10, preserve height/depth; seven slider rows centered y .5,0,-.5,-1,-1.5,-2,-2.5; reset/close x-2/+2 at original y. Hide BindingsHeader or use summary. Cache and restore stock geometry on subsequent non-spring opening.
+
+SFXVolume slider template root transform2291/GameObject193 scale1, localPosition(-1.25,.5,0), layer5.
+Children:
+Label RectTransform6773 anchoredPosition(-1.715,0),sizeDelta(40,5),pivot(0,.5),scale .0857518,z=-5.
+BG transform2203 localPosition(2.25,0,0),scale(2,.125,1).
+Slider knob transform2308 localPosition(2.25,0,-1),scale(.25,.5,1).
+Set BG position/scale to tune rail width; UpdateSlider uses native renderer bounds so preserve BG/Slider names/references and call Init. Clone native text labels instead of adding canvas text. Disable I2 localization on all custom label clones.
+
+Limits: static shipped-artifact analysis, not runtime visual/input test. Actual UI focus ordering and text fit must be verified in game after compilation. Native popup existing lifecycle makes mouse/gamepad focus available automatically, but cloning into active hierarchy can trigger OnEnable before Init: consider instantiate under inactive staging parent, set up and Init, then activate under popup.
+
+2026-11-01 Apply All sound: ShowPartSetControls calls Audio.PlayUIOpen at VA 0x18044304e (callee RVA 0x302a90). Generated Audio binding exposes public static PlayUIOpen(). Apply All calls this after successful application, including an already-matching no-op.

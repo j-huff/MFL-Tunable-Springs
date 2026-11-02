@@ -1,35 +1,19 @@
-using System.Globalization;
 namespace MarsSpringTuner;
 
-public sealed record Settings(bool Enabled, float[][] Springs)
+public static class Settings
 {
     public static float[][] Defaults() => new[] {
         new float[]{400,30,30,30,30,.5f,.5f}, new float[]{1000,60,60,60,60,.5f,.5f},
         new float[]{4000,200,200,200,200,.5f,.5f}, new float[]{5000,20,20,20,20,.5f,.5f},
         new float[]{20000,100,100,100,100,.5f,.5f}, new float[]{50000,100,100,100,100,.5f,.5f}};
 
-    public static Settings Parse(string text)
-    {
-        var words=text.Split((char[]?)null,StringSplitOptions.RemoveEmptyEntries);
-        if(words.Length<2 || (words[1]!="0" && words[1]!="1")) throw new FormatException("Invalid enabled flag");
-        int version=int.Parse(words[0],CultureInfo.InvariantCulture);
-        int count=version switch {1=>11,2=>23,3=>44,_=>throw new FormatException("Unknown tuning version")};
-        if(words.Length!=count) throw new FormatException("Wrong number of tuning values");
-        var rows=Defaults(); int offset=2;
-        for(int k=0;k<(version==3?6:3);k++)
-        {
-            if(version==1) {
-                float stiffness=Read(words[offset++]),compression=Read(words[offset++]),rebound=Read(words[offset++]);
-                rows[k]=new[]{stiffness,compression,compression,rebound,rebound,.5f,.5f};
-            } else for(int j=0;j<7;j++) rows[k][j]=Read(words[offset++]);
-        }
-        foreach(var row in rows) for(int j=0;j<7;j++) {
+    public static void ValidateValues(float[] row) {
+        if(row.Length!=7)throw new FormatException("Each spring needs seven tuning values");
+        for(int j=0;j<7;j++) {
             float min=j>=5?.001f:0, max=j==0?100000:j>=5?100:20000;
             if(!float.IsFinite(row[j])||row[j]<min||row[j]>max) throw new FormatException("Tuning value outside allowed range");
         }
-        return new Settings(words[1]=="1",rows);
     }
-    static float Read(string value)=>float.Parse(value,NumberStyles.Float,CultureInfo.InvariantCulture);
 }
 public static class Damping
 {
@@ -48,5 +32,32 @@ public static class Damping
         float threshold=row[compression?5:6];
         float blend=Math.Clamp((MathF.Abs(speed)/threshold-.9f)/.2f,0,1);
         int low=compression?1:3;return row[low]+blend*(row[low+1]-row[low]);
+    }
+}
+
+public static class SliderScale
+{
+    public static float Max(int index)=>index==0?100000:index<5?20000:100;
+    public static float Decode(int index,float normalized) {
+        float value=Math.Clamp(normalized,0,1);
+        float decoded=index>=5?.001f*MathF.Pow(100000,value):MathF.Exp(value*MathF.Log(1+Max(index)))-1;
+        return Math.Clamp(decoded,index>=5?.001f:0,Max(index));
+    }
+    public static float Encode(int index,float value)=>Math.Clamp(index>=5?MathF.Log(Math.Max(.001f,value)/.001f)/MathF.Log(100000):MathF.Log(1+Math.Max(0,value))/MathF.Log(1+Max(index)),0,1);
+}
+
+public static class BulkTuning
+{
+    // Pure tree selection: scope comes only from the supplied vehicle root.
+    public static List<T> Matching<T>(T root,int sourceId,Func<T,int> id,Func<T,IEnumerable<T>> children,Func<T,long> identity) where T:class {
+        int kind=Damping.Kind(sourceId);if(kind<0)throw new ArgumentException("Not a spring type");
+        var matches=new List<T>();var stack=new Stack<T>();var seen=new HashSet<long>();stack.Push(root);
+        while(stack.Count>0) {
+            var node=stack.Pop();if(!seen.Add(identity(node)))continue;
+            if(seen.Count>SaveTrailer.MaxNodes)throw new InvalidOperationException("Vehicle exceeds supported size");
+            if(Damping.Kind(id(node))==kind)matches.Add(node);
+            foreach(var child in children(node))if(child!=null)stack.Push(child);
+        }
+        return matches;
     }
 }

@@ -1,0 +1,24 @@
+{
+  "version": "2.1.1",
+  "baseline_commit": "0df54b4",
+  "plugin_sha256": "10b252f792660e75c1e44cb682942321232713ec33d409d1961185a73e461cb2",
+  "validation": [
+    "build: zero warnings/errors",
+    "managed physics tests passed",
+    "persistence codec tests passed",
+    "same-ID snapshots independent",
+    "vehicle-scoped Apply All selection passed",
+    "70,007 slider positions validated",
+    "user confirmed native popup opens in version 2.0.0",
+    "user confirmed Apply All works in 2.1.0",
+    "Saved designs native save/load/rename paths traced",
+    "PNG padding, stale tail and parser boundary regression tests passed",
+    "Apply All uses native Audio.PlayUIOpen",
+    "legacy web panel and unused text-config parser removed; build and managed suite passed"
+  ],
+  "pending": [
+    "2.1.1 live sound and slot save/load after restart",
+    "native padded save roundtrip opt-in checks",
+    "native undo/redo"
+  ]
+}

@@ -1,3 +1,5 @@
+> Historical documentation for the retired native mod. The web panel and its launcher have been removed; use the BepInEx mod described in the main README.
+
 # Mars First Logistics — live spring tuner
 
 A native mod and local browser control panel for Light, Medium and Heavy Springs and Torsion Springs. Each family has stiffness, low-speed compression, high-speed compression, low-speed rebound, and high-speed rebound damping, plus separate compression/rebound shaft-speed crossovers. Normal, compressed and extended variants share their family's settings. Select one of the six types using the dropdown; edits stay in place when switching types.
